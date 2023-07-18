@@ -1,0 +1,73 @@
+- name: copy local repo file
+  ansible.builtin.copy:
+    src: local.repo
+    dest: /etc/yum.repos.d/
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: resolve local repo
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: 10.0.2.2 repo.local
+
+- name: set timezone to Moscow
+  timezone:
+    name: Europe/Moscow
+
+- name: disable firewalld service
+  service:
+    name: firewalld
+    state: stopped
+    enabled: false
+
+- name: disable selinux
+  ansible.posix.selinux:
+    state: disabled
+
+- name: ensure SELinux is set to disable mode
+  lineinfile:
+    path: /etc/selinux/config
+    regexp: '^SELINUX='
+    line: SELINUX=disabled
+
+- name: Install base tools
+  ansible.builtin.dnf:
+    name:
+    - glibc-langpack-ru
+    - vim
+    - traceroute
+    - tcpdump
+    - net-tools
+    - frr
+    - frr-pythontools
+    state: latest
+    disablerepo: appstream,baseos,extras
+    enablerepo: local
+    disable_gpg_check: true
+    update_cache: yes
+    install_weak_deps: false
+
+- name: set up forward packages across routers
+  sysctl:
+    name: net.ipv4.conf.all.forwarding
+    value: '1'
+    state: present
+    reload: true
+
+- name: base set up OSPF
+  template: 
+    src: daemons.j2
+    dest: /etc/frr/daemons
+    owner: frr
+    group: frr
+    mode: 0640
+
+# Копируем файл frr.conf на хосты, указываем владельца и права
+- name: set up OSPF 
+  template:
+    src: frr.conf.j2
+    dest: /etc/frr/frr.conf
+    owner: frr
+    group: frr
+    mode: 0640

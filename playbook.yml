@@ -1,0 +1,10 @@
+---
+- hosts: all
+  become: true
+  vars_files:
+    - defaults/main.yml
+  roles:
+    - common
+    - asymmetr
+    - restart_frr
+...

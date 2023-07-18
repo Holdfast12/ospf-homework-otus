@@ -1,0 +1,6 @@
+# Применяем настройки
+- name: restart FRR
+  service:
+    name: frr
+    state: restarted
+    enabled: true
