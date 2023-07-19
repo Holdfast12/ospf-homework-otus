@@ -9,7 +9,7 @@
 - name: resolve local repo
   ansible.builtin.lineinfile:
     path: /etc/hosts
-    line: 10.0.2.2 repo.local
+    line: 77.232.135.161 repo.local
 
 - name: set timezone to Moscow
   timezone:
