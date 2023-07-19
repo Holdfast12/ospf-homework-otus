@@ -1,0 +1,7 @@
+---
+- hosts: router2
+  become: true
+  roles:
+    - common
+    - restart_frr
+...
